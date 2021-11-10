@@ -9,16 +9,11 @@ nCells = Quantidade de células no bittorio
 ruleInt = Integer que representa a regra
 rule = representação binária das regras de cálculo das gerações.
 freqBittorio = Array com nCells posições que armazena os estados das células (0 ou 1) para a síntese das frequências
-ampBittorio = Array com 4*nCells posições para armazenar as amplitudes para cada frequência em freqBittorio.
-a cada 4 células formamos um valor de 4 bits (0 a 16) para converter em valor de amplitude.
+
 
 freqBittorio:
 [ 0, 1, 0, 0, 0, 1 ...] = frequência ligada ou desligada em um range/resolução de frequências a ser determinada pela quantidade de células. Da mesma forma que os BINS de uma análise de FFT.
-ampBittorio
-[ 0, 1, 1, 0,      0, 0, 0, 1,
-amp1 = 5         amp2 = 1 ....
 
-valores de amplitudes serão escalonados com .linlin(0,15,0.0,1.0);
 
 **** REGRAS ****
 
