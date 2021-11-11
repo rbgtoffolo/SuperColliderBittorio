@@ -8,10 +8,10 @@ Bittorio01.new(numeroDeCelulas, regraEmInteiro de 0 a 255);
 nCells = Quantidade de células no bittorio
 ruleInt = Integer que representa a regra
 rule = representação binária das regras de cálculo das gerações.
-freqBittorio = Array com nCells posições que armazena os estados das células (0 ou 1) para a síntese das frequências
+cells = Array com nCells posições que armazena os estados das células (0 ou 1) para a síntese das frequências
 
 
-freqBittorio:
+cells:
 [ 0, 1, 0, 0, 0, 1 ...] = frequência ligada ou desligada em um range/resolução de frequências a ser determinada pela quantidade de células. Da mesma forma que os BINS de uma análise de FFT.
 
 
@@ -33,14 +33,14 @@ Nas duas primeiras e últimas células da ponto o cálculo é feito usando a out
 */
 
 Bittorio01 {
-	var <>nCells = 1024, <>ruleInt = 30,  <rule,  <freqBittorio, <ampBittorio;
+	var <>nCells = 1024, <>ruleInt = 30,  <rule,  <cells;
 
 	*new { | numberOfCells, ruleInteger = 30 |
 		^super.new.init(numberOfCells, ruleInteger);
 	}
 
 
-	// inicia variáveis da instância e cria arrays freqBittorio e ampBittorio com distribuição randômica de 0s e 1s.
+	// inicia variáveis da instância e cria arrays cells e ampBittorio com distribuição randômica de 0s e 1s.
 
 	init { | numberOfCells, ruleInteger |
 
@@ -51,8 +51,7 @@ Bittorio01 {
 		);
 
 		nCells = numberOfCells;
-		freqBittorio = Array.fill(nCells, { [0,1].choose });
-		ampBittorio = Array.fill(nCells*4, {[0,1].choose});
+		cells = Array.fill(nCells, { [0,1].choose });
 		ruleInt = ruleInteger;
 		rule = ruleInt.asBinaryDigits;
 	}
@@ -88,37 +87,54 @@ Bittorio01 {
 
 	calcNextGen {
 		var nextGeneration = Array.new(nCells);
-		freqBittorio.do({ | cell, count |
+		cells.do({ | cell, count |
 			var result;
 			result = case
 			{ count == 0 }
 			{ var left, right;
-				left = freqBittorio.last;
-				right = freqBittorio.at(count+1);
+				left = cells.last;
+				right = cells.at(count+1);
 				//postf("left: % - cell: %  - right: % \n", left, cell, right);
 				result = this.prState(left, cell, right);
 			}
-			{ count == (freqBittorio.size-1) }
+			{ count == (cells.size-1) }
 			{ var left, right;
-				left = freqBittorio.at(count-1);
-				right = freqBittorio.first;
+				left = cells.at(count-1);
+				right = cells.first;
 				//postf("left: % - cell: %  - right: % \n", left, cell, right);
 				result = this.prState(left, cell, right);
 			}
-			{ (count != 0) && (count != (freqBittorio.size-1)) }
+			{ (count != 0) && (count != (cells.size-1)) }
 			{ var left, right;
-				left = freqBittorio.at(count-1);
-				right = freqBittorio.at(count+1);
+				left = cells.at(count-1);
+				right = cells.at(count+1);
 				//postf("left: % - cell: %  - right: % \n", left, cell, right);
 				result = this.prState(left, cell, right);
 			};
 
 			nextGeneration.add(result);
 		});
-		freqBittorio = nextGeneration;
-		//^freqBittorio;
+		cells = nextGeneration;
+		^cells;
 	}
 
+	// Método para pegar os estados do bittorio de n e n (bitSize) itens e transformar em decimal.
 
-
+	groupDecimal { | bitSize |
+		var tempArray = Array.new(cells.size);
+		(cells.size/bitSize).do({ | count |
+			var temp, pos;
+			pos = bitSize * count;
+			temp = 0;
+			bitSize.do({ arg i;
+				var decimal = 0;
+				decimal = cells.at(pos+i) * 2.pow((bitSize-1)-i);
+				temp = temp + decimal;
+			});
+			tempArray.add(temp);
+		});
+		^tempArray;
+	}
 }
+
+
